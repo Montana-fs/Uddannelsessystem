@@ -69,8 +69,9 @@ function buildHtml(report, catalog) {
       </div>
       <div class="progress-label">${done}/${total} prioriteter bestået</div>` : `<div class="progress-label muted">Ingen prioriteter sat</div>`;
 
+    const isAllDone = prios.length > 0 && prios.every(p => p.status === 'bestået');
     return `
-    <div class="k-card ${k.udloeberSnart.length ? 'has-recert' : ''}">
+    <div class="k-card ${k.udloeberSnart.length ? 'has-recert' : ''}" data-recert="${k.udloeberSnart.length > 0}" data-alldone="${isAllDone}">
       <div class="k-header">
         <div class="k-name">${escHtml(k.navn)}</div>
         <div class="k-badges">
@@ -203,15 +204,15 @@ function buildHtml(report, catalog) {
   </div>
   <div class="nav-section">
     <div class="nav-label">Overblik</div>
-    <div class="nav-item active">
+    <div class="nav-item active" data-filter="all" onclick="setFilter('all')">
       <span class="nav-dot cyan"></span> Alle konsulenter
       <span class="nav-count">${report.length}</span>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" data-filter="recert" onclick="setFilter('recert')">
       <span class="nav-dot red"></span> Re-cert snart
       <span class="nav-count">${expiringSoon.length}</span>
     </div>
-    <div class="nav-item">
+    <div class="nav-item" data-filter="alldone" onclick="setFilter('alldone')">
       <span class="nav-dot yellow"></span> Prios på plads
       <span class="nav-count">${allDone.length}</span>
     </div>
@@ -265,11 +266,32 @@ function buildHtml(report, catalog) {
   <div class="section-title">Re-certificering — tidslinje</div>
   <div class="tl-section">${recertTimeline}</div>
 
-  <div class="section-title">Konsulenter</div>
-  <div class="k-grid">${konsulentCards}</div>
+  <div class="section-title" id="konsulenter-title">Konsulenter</div>
+  <div class="k-grid" id="k-grid">${konsulentCards}</div>
+  <div id="no-results" style="display:none; padding:24px; color:#475569; font-size:13px;">Ingen konsulenter matcher dette filter.</div>
 
   <div class="footer">Genereret ${new Date().toLocaleString('da-DK')} · Zentura Uddannelsesoversigt</div>
 </div>
+<script>
+  function setFilter(filter) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.querySelector('[data-filter="' + filter + '"]').classList.add('active');
+
+    const cards = document.querySelectorAll('#k-grid .k-card');
+    let visible = 0;
+    cards.forEach(card => {
+      let show = true;
+      if (filter === 'recert')  show = card.dataset.recert === 'true';
+      if (filter === 'alldone') show = card.dataset.alldone === 'true';
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const titles = { all: 'Konsulenter', recert: 'Re-certificering snart', alldone: 'Alle prioriteter bestået' };
+    document.getElementById('konsulenter-title').textContent = titles[filter];
+    document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+  }
+</script>
 </body>
 </html>`;
 }
