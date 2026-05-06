@@ -15,7 +15,9 @@ const KONSULENT_COLS = {
   'Benjamin Fougt':    9,
   'Michael Magnussen': 10,
   'August':            11,
-  'Charly Münch':      12,
+  'Charly Munch':      12,
+  'Victor Ladegaard':  13,
+  'August':            11,
 };
 
 function readPriorities() {

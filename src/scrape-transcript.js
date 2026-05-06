@@ -10,7 +10,8 @@ const KONSULENTER = [
   { navn: 'Ricki Mikkelsen',   url: 'https://learn.microsoft.com/da-dk/users/rickim-2768/transcript/vjwg5hyooqmpykq' },
   { navn: 'Michael Magnussen', url: 'https://learn.microsoft.com/en-us/users/michaelmagnussen-3499/transcript/d484t688o2qjx0v' },
   { navn: 'Simon Kaas Hansen', url: 'https://learn.microsoft.com/da-dk/users/simonkaashansen-7131/transcript/d8189h499wyggle' },
-  { navn: 'Charly Münch',      url: 'https://learn.microsoft.com/da-dk/users/charlymunch-5729/transcript/dzmgmaj008qx5je' },
+  { navn: 'Charly Munch',      url: 'https://learn.microsoft.com/da-dk/users/charlymunch-5729/transcript/dzmgmaj008qx5je' },
+  // Victor og August: transcript-URLs mangler endnu
 ];
 
 async function dismissCookies(page) {

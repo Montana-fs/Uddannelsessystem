@@ -21,11 +21,15 @@ function urgencyClass(days) {
   return 'ok';
 }
 
-function buildHtml(report) {
+function buildHtml(report, catalog) {
   const totalCerts   = report.reduce((n, k) => n + k.passedCodes.length, 0);
   const expiringSoon = report.filter(k => k.udloeberSnart.length > 0);
   const allDone      = report.filter(k => k.prioritized.length > 0 && k.prioritized.every(p => p.status === 'bestået'));
   const dateStr      = new Date().toLocaleDateString('da-DK', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  // Retiring exam codes map: { 'AZ-500': { daysLeft, retirementDate } }
+  const retiringMap = {};
+  for (const r of (catalog?.retiring || [])) retiringMap[r.code] = r;
 
   // Næste re-cert på tværs af alle
   const alleRecerts = report.flatMap(k => k.udloeberSnart.map(u => ({ ...u, navn: k.navn })))
@@ -41,11 +45,15 @@ function buildHtml(report) {
       const ikon  = p.status === 'bestået' ? '✓' : '○';
       const cls   = p.status === 'bestået' ? 'done' : 'missing';
       const dato  = p.dato ? `<span class="prio-date">${escHtml(p.dato)}</span>` : '';
+      const retiring = retiringMap[p.examCode];
+      const retireBadge = retiring
+        ? `<span class="retire-badge ${urgencyClass(retiring.daysLeft)}">⏰ ${retiring.daysLeft}d</span>`
+        : '';
       return `<div class="prio-row ${cls}">
         <span class="prio-ikon">${ikon}</span>
         <span class="prio-num">Prio ${p.prioritet}</span>
         <span class="prio-code">${escHtml(p.examCode)}</span>
-        ${dato}
+        ${dato}${retireBadge}
       </div>`;
     }).join('');
 
@@ -154,6 +162,24 @@ function buildHtml(report) {
     .recert-row.ok .recert-days { color: #64748b; }
     .recert-title { color: #64748b; line-height: 1.4; }
 
+    /* Pensionerings-badge på prioriterede rækker */
+    .retire-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 8px; margin-left: 4px; flex-shrink: 0; }
+    .retire-badge.urgent  { background: rgba(239,68,68,.15); color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+    .retire-badge.warning { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
+    .retire-badge.ok      { background: rgba(100,116,139,.15); color: #94a3b8; border: 1px solid rgba(100,116,139,.3); }
+
+    /* Pensioneringsadvarsler panel */
+    .alert-panel { background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.25); border-radius: 10px; padding: 16px 20px; margin-bottom: 28px; }
+    .alert-panel-title { font-size: 11px; font-weight: 700; color: #ef4444; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+    .alert-row { display: grid; grid-template-columns: 70px 80px 1fr 110px; gap: 12px; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(239,68,68,.1); font-size: 12px; }
+    .alert-row:last-child { border-bottom: none; }
+    .alert-days { font-weight: 700; color: #ef4444; }
+    .alert-code { font-weight: 700; color: #cbd5e1; }
+    .alert-title { color: #94a3b8; }
+    .alert-date { color: #64748b; text-align: right; }
+    .alert-replacement { font-size: 11px; color: #22c55e; grid-column: 2 / -1; padding-bottom: 4px; }
+    .alert-replacement.no-replacement { color: #475569; }
+
     /* Timeline */
     .tl-section { background: #0f1923; border: 1px solid #1e293b; border-radius: 10px; padding: 20px; margin-bottom: 28px; }
     .tl-row { display: grid; grid-template-columns: 70px 160px 1fr 90px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 12px; }
@@ -215,6 +241,27 @@ function buildHtml(report) {
     </div>
   </div>
 
+  ${catalog?.retiring?.length ? `
+  <div class="section-title">Pensioneringsadvarsler — eksamener i Excel der fjernes</div>
+  <div class="alert-panel">
+    <div class="alert-panel-title">⚠ ${catalog.retiring.length} prioriterede eksamener pensioneres</div>
+    ${catalog.retiring.sort((a,b) => a.daysLeft - b.daysLeft).map(r => {
+      const rep = r.replacement;
+      const repHtml = rep
+        ? rep.code
+          ? `<div class="alert-replacement">↳ Erstattes af <strong>${escHtml(rep.code)}</strong> — ${escHtml(rep.name)}</div>`
+          : `<div class="alert-replacement no-replacement">↳ ${escHtml(rep.note)}</div>`
+        : '';
+      return `
+    <div class="alert-row">
+      <span class="alert-days">${r.daysLeft} dage</span>
+      <span class="alert-code">${escHtml(r.code)}</span>
+      <span class="alert-title">${escHtml(r.name)}</span>
+      <span class="alert-date">${escHtml(r.retirementDate)}</span>
+    </div>${repHtml}`;
+    }).join('')}
+  </div>` : ''}
+
   <div class="section-title">Re-certificering — tidslinje</div>
   <div class="tl-section">${recertTimeline}</div>
 
@@ -234,7 +281,9 @@ function main() {
     process.exit(1);
   }
   const report  = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
-  const html    = buildHtml(report);
+  const catalogFile = path.join(ROOT, 'catalog-check.json');
+  const catalog = fs.existsSync(catalogFile) ? JSON.parse(fs.readFileSync(catalogFile, 'utf8')) : null;
+  const html    = buildHtml(report, catalog);
   const outFile = path.join(ROOT, 'uddannelse-dashboard.html');
   fs.writeFileSync(outFile, html, 'utf8');
   console.log(`Dashboard genereret: uddannelse-dashboard.html`);
