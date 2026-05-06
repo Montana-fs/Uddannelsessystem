@@ -1,0 +1,7 @@
+node_modules/
+scrape-result.json
+priority-report.json
+debug-*.html
+*.xlsx
+*.xls
+*.docx
