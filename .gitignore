@@ -5,3 +5,18 @@ debug-*.html
 *.xlsx
 *.xls
 *.docx
+
+# Følsomme data
+readynez-config.json
+
+# Runtime-filer (genereres dagligt)
+catalog-check.json
+notify-log.json
+notify-runner.log
+pending-notifications.json
+ms-catalog.json
+pa-flow-id.txt
+
+# Screenshots og dumps
+*.png
+readynez-dump.*

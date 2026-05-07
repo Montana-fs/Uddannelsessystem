@@ -11,7 +11,8 @@ const KONSULENTER = [
   { navn: 'Michael Magnussen', url: 'https://learn.microsoft.com/en-us/users/michaelmagnussen-3499/transcript/d484t688o2qjx0v' },
   { navn: 'Simon Kaas Hansen', url: 'https://learn.microsoft.com/da-dk/users/simonkaashansen-7131/transcript/d8189h499wyggle' },
   { navn: 'Charly Munch',      url: 'https://learn.microsoft.com/da-dk/users/charlymunch-5729/transcript/dzmgmaj008qx5je' },
-  // Victor og August: transcript-URLs mangler endnu
+  { navn: 'Victor Ladegaard', url: 'https://learn.microsoft.com/da-dk/users/victorladegaard-1788/' },
+  // August: på skole — tilbage august 2026
 ];
 
 async function dismissCookies(page) {

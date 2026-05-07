@@ -1,0 +1,47 @@
+{
+  "teams": {
+    "webhook": "",
+    "tonyEmail": "tony.andersen@zentura.dk"
+  },
+  "konsulenter": {
+    "Anders Gornitzka": "anders.gornitzka@zentura.dk",
+    "Benjamin Fougt": "benjamin.fougt@zentura.dk",
+    "Charly Munch": "charly.munch@zentura.dk",
+    "Kennet Thorsen": "kennet.thorsen@zentura.dk",
+    "Leon Pedersen": "leon.pedersen@zentura.dk",
+    "Michael Magnussen": "michael.magnussen@zentura.dk",
+    "Ricki Mikkelsen": "ricki.mikkelsen@zentura.dk",
+    "Simon Kaas Hansen": "simon.kaas.hansen@zentura.dk",
+    "Victor Ladegaard": "victor.ladegaard@zentura.dk"
+  },
+  "kort": [
+    {
+      "id": 1,
+      "licensnøgle": "UTR-2024-10639",
+      "konsulent": "August Jepsen",
+      "start": "2025-12-02",
+      "slut": "2026-06-02",
+      "betalingsFrist": "2026-11-03",
+      "transcriptUrl": "https://learn.microsoft.com/en-us/users/augustjepsen-2765/transcript/d5gr8ajn0zpkj0w"
+    },
+    {
+      "id": 2,
+      "licensnøgle": "UTR-2025-94272",
+      "konsulent": "Michael Magnussen",
+      "start": "2026-01-16",
+      "slut": "2026-07-16",
+      "betalingsFrist": "2026-05-11",
+      "næste": "Charly Munch"
+    }
+  ],
+  "koe": [
+    "Ricki Mikkelsen",
+    "Victor Ladegaard",
+    "Anders Gornitzka",
+    "Simon Kaas Hansen",
+    "Leon Pedersen",
+    "Kennet Thorsen",
+    "Benjamin Fougt",
+    "Michael Magnussen"
+  ]
+}

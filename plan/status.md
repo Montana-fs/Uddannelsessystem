@@ -1,6 +1,6 @@
 # Status
 
-**Sidst opdateret:** 2026-05-06
+**Sidst opdateret:** 2026-05-07
 
 ## Hvad virker
 
@@ -18,6 +18,26 @@
 - Henter MS Learn pensioneringsside og finder pensionerede eksamener i Excel
 - Viser erstatningseksamen hvor kendt (AZ-500→SC-500, AZ-204→AI-200)
 - Gemmer `catalog-check.json`
+
+### Kør.bat
+- Ét dobbeltklik kører scraper → priority matcher → notify → dashboard i rækkefølge
+- Afbryder med fejlbesked hvis scraper eller matcher fejler
+
+### Klippekort-styring (`src/klippekort.js` + `klippekort.json`)
+- JSON-datastore med aktive kort (konsulent, start, slut, fornyFrist) og rotationskø
+- CLI: `status`, `roter <1|2>`, `koe add/rm/list`
+- `roter` sætter nye datoer (start=i dag, slut=+6 mdr, fornyFrist=+5 mdr), rykker konsulent bagerst i kø, sender aktiveringsbesked med prioriteter
+- E-mails til konsulenter er placeholders — skal verificeres
+
+### Notifikationer (`src/notify.js`)
+- Kører automatisk i Kør.bat
+- Sender Teams-besked til konfigureret webhook ved:
+  - Klippekort udløber om ≤30 dage (til konsulent)
+  - FornyFrist om ≤30 dage (til Tony)
+  - Re-cert om ≤90 og ≤30 dage (til konsulent + Tony)
+  - Eksamen pensioneres om ≤90 dage
+- Deduplicering via `notify-log.json` (én besked pr. konsulent pr. tærskel pr. uge)
+- Kræver Teams webhook-URL i `klippekort.json → teams.webhook`
 
 ### HTML Dashboard (`src/generate-dashboard.js`)
 - Mørkt navy-tema, server på port 3738
@@ -63,9 +83,11 @@
 
 ## Næste skridt
 
-1. Skaffe Victor Ladegaard transcript-URL
-2. Overveje om AZ-800/AZ-801 skal ud af Excel (ingen erstatning annonceret)
-3. Opdater Excel: AZ-500 → SC-500 og AZ-204 → AI-200 for relevante konsulenter
-4. `Kør.bat` — ét dobbeltklik der kører scraper → priority matcher → dashboard i rækkefølge
-5. MS Partner Center API og incentives-integration
-6. GitHub repo: https://github.com/Montana-fs/Uddannelsessystem
+1. Udfyld `klippekort.json`: aktuelle kortindehavere + datoer + Teams webhook-URL
+2. Verificer konsulent-emails i `klippekort.json`
+3. Skaffe Victor Ladegaard transcript-URL (afventer svar)
+4. Overveje om AZ-800/AZ-801 skal ud af Excel (ingen erstatning annonceret)
+5. Opdater Excel: AZ-500 → SC-500 og AZ-204 → AI-200 for relevante konsulenter
+6. Vis klippekort-status i dashboardet
+7. MS Partner Center API og incentives-integration
+8. GitHub repo: https://github.com/Montana-fs/Uddannelsessystem
